@@ -143,36 +143,6 @@ categories = {
         },
 
         'picture': "https://images.pexels.com/photos/209804/pexels-photo-209804.jpeg?cs=srgb&dl=active-athlete-baseball-209804.jpg&fm=jpg"
-    }, # By <a href="//commons.wikimedia.org/wiki/User:Fcb981" title="User:Fcb981">Fcb981</a> - <span class="int-own-work" lang="en">Own work</span>, <a href="http://creativecommons.org/licenses/by-sa/3.0/" title="Creative Commons Attribution-Share Alike 3.0">CC BY-SA 3.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=4181930">Link</a>
-    'Frisbee': {
-        'Disc': {
-            'description': 'A frisbee (also called a flying disc or simply a disc) is a gliding toy or sporting item '
-                           'that is generally plastic and roughly 20 to 25 centimetres (8 to 10 in) in diameter with '
-                           'a lip,[1] used recreationally and competitively for throwing and catching, for example, '
-                           'in flying disc games. The shape of the disc, an airfoil in cross-section, allows it to '
-                           'fly by generating lift as it moves through the air while spinning.',
-            'creation_time': time.time(),
-            'category_id': 4,
-            'user_id': 1,
-            'picture': "https://upload.wikimedia.org/wikipedia/commons/b/b6/Frisbee_Catch-_Fcb981.jpg"
-        },
-
-        'Shoes': { # By <a rel="nofollow" class="external text" href="https://www.flickr.com/people/64018555@N03">Maryland GovPics</a> - <a rel="nofollow" class="external text" href="https://www.flickr.com/photos/mdgovpics/27687809880/">Under Armour Opening</a>, <a href="https://creativecommons.org/licenses/by/2.0" title="Creative Commons Attribution 2.0">CC BY 2.0</a>, <a href="https://commons.wikimedia.org/w/index.php?curid=49890376">Link</a>
-            'description': "Cleats or studs are protrusions on the sole of a shoe, or on an external attachment to a "
-                           "shoe, that provide additional traction on a soft or slippery surface. They can be conical "
-                           "or blade-like in shape, and made of plastic, rubber or metal. In American English the "
-                           "term cleats is used synecdochically to refer to shoes featuring such protrusions. "
-                           "Similarly, in British English the term 'studs' can be used to refer to 'football boots' "
-                           "or 'rugby boots', for instance, in a similar manner to the way 'spikes' is often used to "
-                           "refer to athletics shoes. The type of studs worn depends on the environment of play, "
-                           "whether it be grass, ice, artificial turf, or other grounds requiring versatility.",
-            'creation_time': time.time(),
-            'category_id': 4,
-            'user_id': 1,
-            'picture': "https://upload.wikimedia.org/wikipedia/commons/a/a9/Under_Armour_Opening_%2827687809880%29.jpg"
-        },
-
-        'picture': "https://upload.wikimedia.org/wikipedia/commons/a/a9/Under_Armour_Opening_%2827687809880%29.jpg"
     },
     'Snowboarding': {
         'Snowboard': {
@@ -205,7 +175,7 @@ categories = {
 user1 = User(
     id=1,
     name="Amanda",
-    email="amanda@gmail.com",
+    email="dummyisthis@gmail.com",
     picture="https://image.flaticon.com/icons/svg/236/236934.svg"
 )
 
@@ -235,7 +205,7 @@ for category_name in categories:
             uid = items_dict.get('user_id')
             picture = items_dict.get('picture')
 
-            print("--- {} {} {} {}".format(desc, time, cat_id, uid))
+            print("   {} {} {} {}".format(desc, time, cat_id, uid))
             item = Item(name=item,
                         description=desc,
                         creationtime=datetime.datetime.now(),

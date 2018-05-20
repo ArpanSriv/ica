@@ -10,7 +10,7 @@ This app is a project for the Full Stack Web Developer Nanodegree at Udacity.
 
     *  **Frontend**
 
-       This app uses Material Design Bootstrap Library and Material Icons Libraries to make up the front-end.
+       This app uses Material Design Bootstrap Library and Material Icons Libraries to follow the Material Design Guidelines.
 
 * ### About
 
@@ -44,7 +44,14 @@ This app is a project for the Full Stack Web Developer Nanodegree at Udacity.
    - _Note: Don't run the server using `http://127.0.0.1:5000` as it can cause problems with the Google Sign In._
 
 * ### API Endpoints
-* **Catalog Json**: `/catalog/json` _Display the whole catalog, including all categories and items._
-* **Categories Json**: `/categories/json` _Display the all categories present._
-* **Category Item Json**: `/<string:category_name>/<string:item_name>/json` _Display the JSON of a particular item in a category._
-* **Category Items Json**: `/category/items/json` _Display a particular category's items JSON._ 
+    * **Catalog Json**: `/catalog/json` _Display the whole catalog, including all categories and items._
+    * **Categories Json**: `/categories/json` _Display the all categories present._
+    * **Category Item Json**: `/<string:category_name>/<string:item_name>/json` _Display the JSON of a particular item in a category._
+    * **Category Items Json**: `/category/items/json` _Display a particular category's items JSON._ 
+
+* ### External Libraries Used
+    1. JQuery: (<https://jquery.com/>)
+    2. JQuery Toast Plugin (<https://github.com/kamranahmedse/jquery-toast-plugin>)
+    3. Material Design for Bootstrap 4 (<https://mdbootstrap.com/>)
+    4. Material Icons by Google: (<https://material.io/tools/icons/?style=baseline>)
+    5. Font Awesome Icons: (<https://fontawesome.com/icons>)
