@@ -1,0 +1,78 @@
+#background {
+    height: 200%;
+    background: url("../img/athlete-beach-bodybuilder-305239.jpg") no-repeat fixed center;
+}
+
+#container {
+    display: block;
+    text-align: center;
+    padding-top: 100px;
+    margin-bottom: 50px;
+}
+
+#catalogs-container, #items-container {
+    max-width: 100%;
+    /* margin: 50px 50px 50px 50px; */
+    /* box-sizing: border-box; */
+    /*box-sizing: content-box;*/
+}
+
+#catalogcard, #itemcard {
+    margin: 10px;
+    width: calc(100% * (1 / 4) - 5px - 1px);
+    cursor: move;
+}
+
+#desctext {
+    text-align: justify;
+}
+
+.title {
+    text-align: center;
+}
+
+#detailCard {
+    width: 60%;
+}
+
+#editModal {
+    text-align: left;
+    align-content: left;
+    alignment: left;
+    display: unset;
+}
+
+.fab {
+    width: 64px;
+    height: 64px;
+    background-color: red;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transition: all 0.1s ease-in-out;
+    z-index: 2;
+    font-size: 50px;
+    color: white;
+    text-align: center;
+    line-height: 70px;
+    position: fixed;
+    right: 50px;
+    bottom: 50px;
+}
+
+.fab:hover {
+    box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    transform: scale(1.05);
+}
+
+#parent {
+    position: relative;
+}
+
+#child {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+
+

@@ -1,0 +1,146 @@
+{% extends "main.html" %}
+
+{% block navbar %}
+
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark brown">
+
+        <!-- Navbar brand -->
+        <a class="navbar-brand" href="{{ url_for('displayCatalog') }}">Item Catalog</a>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="nav-links">
+
+            <!-- Links -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('displayCatalog') }}">
+                        Categories
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Items</a>
+                    <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                        {% if items %}
+                            {% for item in items %}
+                                <a class="dropdown-item"
+                                   href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=item.name) }}">{{ item.name }}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+    </nav>
+{% endblock navbar %}
+
+{% block container %}
+
+    <h1 class="title">{{ catalog_name }}</h1>
+
+    <div id="items-container">
+        <div class="d-flex flex-wrap justify-content-center">
+            {% if items %}
+
+                {% for item in items %}
+
+                    {#                <div class="p-2">#}
+                    <div class="card" id="itemcard">
+
+                        <div class="card-header" style="padding: 0;">
+                            <!-- Card image -->
+                            <div class="view overlay">
+
+                                <img class="card-img-top" style="height: 200px;"
+                                     src="{{ item.picture }}"
+                                     alt="{{ item.name }}">
+                                {#                            <a href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}">#}
+                                {#                                <div class="mask rgba-white-slight"></div>#}
+                            </div>
+                        </div>
+
+                        <!-- Card content -->
+                        <div class="card-body">
+
+                            <!-- Title -->
+                            <h4 class="card-title">{{ item.name }}</h4>
+                            <!-- Text -->
+                            <p id="desctext" class="card-text">{{
+
+                                    (item.description[:75] + '..') if item.description|length > 75 else item.description
+
+                                    }}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <a href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=item.name) }}"
+                               class="btn btn-primary">Details</a>
+                        </div>
+
+                    </div>
+                    {#                </div>#}
+
+                {% endfor %}
+
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="addNewItemModal" tabindex="-1" role="dialog" aria-labelledby="newItemModal"
+         aria-hidden="true" style="text-align: left">
+        <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <h4 class="modal-title w-100 font-weight-bold">Add an Item</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body mx-3">
+
+                    <form action="{{ url_for('displayCategoryContents', catalog_name=catalog_name) }}" method="post">
+
+                        <div class="md-form mb-5">
+                            <input type="text" id="itemNameInput" class="form-control" name="name">
+                            <label for="itemNameInput">Name</label>
+                        </div>
+
+                        <div class="md-form mb-5">
+                            <textarea id="itemDescInput" class="form-control md-textarea" name="description"></textarea>
+                            <label for="itemDescInput">Description</label>
+                        </div>
+
+                        <div class="md-form mb-5">
+                            <input type="text" id="picUriInput" class="form-control" name="picuri">
+                            <label for="picUriInput">Picture</label>
+                        </div>
+
+                        <div class="md-form mb-5 d-flex justify-content-center">
+                            <button type="submit" class="btn btn-green">Submit</button>
+                        </div>
+
+                    </form>
+
+                </div>
+                {##}
+                {#                <div class="modal-footer d-flex justify-content-center">#}
+                {#                    <button class="btn btn-indigo">Send <i class="fa fa-paper-plane-o ml-1"></i></button>#}
+                {#                </div>#}
+            </div>
+        </div>
+    </div>
+
+{% endblock container %}
+
+{% block fab %}
+
+    <a class="items-fab" data-toggle="modal" data-target="#addNewItemModal">
+        <div class="fab"> +</div>
+    </a>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends 'main.html' %}
+
+{% block navbar %}
+
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark brown">
+
+        <!-- Navbar brand -->
+        <a class="navbar-brand" href="{{ url_for('displayCatalog') }}">Item Catalog</a>
+
+        <!-- Collapsible content -->
+        <div class="collapse navbar-collapse" id="nav-links">
+
+            <!-- Links -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item dropdown active">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">Categories</a>
+                    <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                        {% if categories %}
+                            {% for category in categories %}
+                                <a class="dropdown-item"
+                                   href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}">{{ category.name }}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('displayRecents') }}">
+                        Recent
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+        <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+    </nav>
+
+{% endblock %}
+
+{% block container %}
+
+    <div style="margin: 10px; text-align: left; background-color: transparent; box-shadow: transparent">
+
+
+        <div class="list-group">
+
+            {% for item in recents %}
+
+                <div class="card" style="margin: 10px;">
+
+                    <a href="{{ url_for('displayItemDetails', catalog_name=item.category.name, item_name=item.name) }}"
+                       class="list-group-item list-group-item-action flex-column align-items-start">
+
+                        <div class="d-flex w-100 justify-content-between">
+
+                            <h4 class="mb-1">{{ item.name }}</h4>
+
+                            <small>{{ calculate_elapsed_time(item.creationtime) }} seconds ago.</small>
+
+                        </div>
+
+                        <p class="mb-1">{{ (item.description[:75] + '..') if item.description|length > 75 else item.description }}</p>
+
+                        <small><strong>{{ item.category.name }}</strong></small>
+
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+
+    </div>
+
+
+{% endblock container %}
+

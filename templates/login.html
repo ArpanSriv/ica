@@ -1,0 +1,121 @@
+<html>
+
+<head>
+    <title>Login</title>
+
+    <meta name="google-signin-client_id"
+          content="498756033550-hf4rh2lntl6b18anjrd64nl4kcogplad.apps.googleusercontent.com">
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.toast.min.css') }}">
+    <script src="{{ url_for('static', filename='js/jquery.toast.min.js') }}"></script>
+
+    <!--Material Design Bootstrap-->
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
+
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+    <!--End of Material Design Bootstrap-->
+
+    <!--Static CSS-->
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+
+<body>
+
+<div class="card mx-auto" style="width: 50%; margin: 100px">
+
+    <!-- GOOGLE PLUS SIGN IN-->
+    <div class="card-header" style="text-align: center">
+        <h3 id="user-name">{{ user.name }}</h3>
+    </div>
+
+    <div class="card-body mx-auto">
+
+        <div style="width: 100px; height: 100px;">
+
+            <img class="img-fluid" style="border-radius: 50%; min-width: 100%;" src="{{ user.picture }}" alt="">
+
+        </div>
+
+    </div>
+
+    <div class="card-footer d-flex justify-content-center">
+        <div id="signinButton" style="padding: inherit;">
+                  <span class="g-signin"
+                        data-scope="openid email"
+                        data-clientid="498756033550-hf4rh2lntl6b18anjrd64nl4kcogplad.apps.googleusercontent.com"
+                        data-redirecturi="postmessage"
+                        data-accesstype="offline"
+                        data-cookiepolicy="single_host_origin"
+                        data-callback="signInCallback"
+                        data-approvalprompt="force">
+                  </span>
+        </div>
+
+        <a href="/gdisconnect" class="btn btn-red">LOGOUT</a>
+
+    </div>
+
+</div>
+
+<script>
+
+    function signInCallback(authResult) {
+        if (authResult['code']) {
+
+            // Hide the sign-in button now that the user is authorized
+            $('#signinButton').attr('style', 'display: none');
+
+            // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+            $.ajax({
+                type: 'POST',
+                url: '/gconnect?state={{STATE}}',
+                processData: false,
+                data: authResult['code'],
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function (result) {
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        window.location.reload();
+
+                        setTimeout(function () {
+                            $.toast("Redirecting...");
+                            window.location.href = '/catalog'
+                        }, 1000);
+
+                    } else if (authResult['error']) {
+
+                        console.log('There was an error: ' + authResult['error']);
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+
+                }
+
+            });
+        }
+    }
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id"
+          content="498756033550-hf4rh2lntl6b18anjrd64nl4kcogplad.apps.googleusercontent.com">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
+    <!--Static CSS-->
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.toast.min.css') }}">
+
+
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/jquery.toast.min.js') }}"></script>
+
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename="js/interact.min.js") }}"></script>
+
+    <title>Item Catalog</title>
+
+</head>
+
+<body>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <script>
+                $.toast({
+                    heading: "Information",
+                    text: "{{ message | safe }}",
+                    icon: "info",
+                    showHideTransition: 'slide',
+                    hideAfter: 5000,
+                    allowToastClose: true,
+                    stack: 10,
+                    textAlign: 'left',
+                    position: 'bottom-left'
+                })
+            </script>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+{#<img id="background-image" src="../static/img/athlete-beach-bodybuilder-305239.jpg">#}
+<div id="background">
+
+    {% block navbar %}
+
+    {% endblock navbar %}
+
+    <div id="container" class="mx-auto" style="width: 80%">
+
+        {% block container %}
+
+        {% endblock container %}
+
+    </div>
+
+    {% block fab %}
+
+    {% endblock fab %}
+
+
+    <div style="display: none;" class="mx-auto d-flex justify-content-center dropzone">
+
+        <p>Drag here to delete</p>
+
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
