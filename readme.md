@@ -45,7 +45,6 @@ This app is a project for the Full Stack Web Developer Nanodegree at Udacity.
 
 * ### API Endpoints
     * **Catalog Json**: `/catalog/json` _Display the whole catalog, including all categories and items._
-    * **Categories Json**: `/categories/json` _Display the all categories present._
     * **Category Item Json**: `/<string:category_name>/<string:item_name>/json` _Display the JSON of a particular item in a category._
     * **Category Items Json**: `/category/items/json` _Display a particular category's items JSON._ 
 
