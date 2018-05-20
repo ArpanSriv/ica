@@ -205,6 +205,7 @@ categories = {
 user1 = User(
     id=1,
     name="Amanda",
+    email="amanda@gmail.com",
     picture="https://image.flaticon.com/icons/svg/236/236934.svg"
 )
 

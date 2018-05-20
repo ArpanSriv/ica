@@ -25,7 +25,7 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('displayCatalog') }}">
+                    <a class="nav-link" href="{{ url_for('displayRecents') }}">
                         Recent
                         <span class="sr-only">(current)</span>
                     </a>
@@ -78,10 +78,12 @@
                         </div>
 
                         <div class="card-footer d-flex justify-content-center">
-                            <a href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}"
-                               class="btn btn-primary">Explore</a>
-                            <a href="{{ url_for('displayRecents') }}" class="btn btn-red"><i class="fa fa-trash" aria-hidden="true"></i>
-                            </a>
+
+                            <form action="{{ url_for('deleteCategory', category_name=category.name) }}" method="post">
+                                <button href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}" class="btn btn-primary">Explore</button>
+                                <button class="btn btn-red"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                            </form>
+
                         </div>
 
                     </div>

@@ -31,6 +31,12 @@
                         {% endif %}
                     </div>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('displayRecents') }}">
+                        Recent
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -44,10 +50,10 @@
 
         <!-- Card image -->
         <div class="view overlay" style="height: 30%">
-            <img class="card-img-top"
+            <img class="card-img-top" style="max-height: 600px;"
                  src="{{ current_item.picture }}"
                  alt="{{ current_item.name }}">
-        </div>
+        </div>1
 
         <div class="card-body">
 
@@ -85,13 +91,11 @@
                           method="post">
 
                         <div class="md-form mb-5">
-                            {#                        <i class="fa fa-user prefix grey-text"></i>#}
                             <input type="text" id="nameInput" class="form-control" name="name">
                             <label data-error="wrong" data-success="right" for="nameInput">Item Name</label>
                         </div>
 
                         <div class="md-form mb-4">
-                            {#                        <i class="fa fa-envelope prefix grey-text"></i>#}
                             <textarea id="descInput" class="form-control md-textarea" name="description"></textarea>
                             <label data-error="wrong" data-success="right" for="descInput">Details</label>
                         </div>
@@ -126,7 +130,7 @@
         <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header text-center">
-                    <h4 class="modal-title w-100 font-weight-bold">Delete {{ current_item.name }}?</h4>
+                    <h4 class="modal-title w-100 font-weight-bold">Delete {{ current_item.name }}</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -134,6 +138,7 @@
 
                 <div class="modal-body mx-3">
 
+                    <p>This change is irreversible. Do you want to continue?</p>
 
                 </div>
 

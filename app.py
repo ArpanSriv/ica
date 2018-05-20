@@ -7,7 +7,7 @@ from datetime import datetime
 import httplib2
 import requests
 import time
-from flask import Flask, render_template, request, flash, redirect, url_for, make_response
+from flask import Flask, render_template, request, flash, redirect, url_for, make_response, jsonify
 from flask import session as login_session
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from sqlalchemy import create_engine, asc, desc
@@ -25,9 +25,36 @@ engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
 session = scoped_session(sessionmaker(bind=engine))
 
-CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 user: User = None
+
+
+@app.route('/catalog/JSON')
+def catalogJSON():
+    categories = session.query(Category).all()
+    category_dict = [c.serialize for c in categories]
+    for c in range(len(category_dict)):
+        category = session.query(Category).filter_by(name=category_dict[c]["name"]).one()
+        items = [i.serialize for i in session.query(Item).filter_by(category=category).all()]
+        if items:
+            category_dict[c]["items"] = items
+
+    return jsonify(Category=category_dict)
+
+
+@app.route('/catalog/<string:catalog_name>/JSON')
+def categoryContentsJSON(catalog_name):
+    category = session.query(Category).filter_by(name=catalog_name).one()
+    items = session.query(Item).filter_by(category=category).all()
+    return jsonify(items=[i.serialize for i in items])
+
+
+@app.route('/catalog/<string:category_name>/<string:item_name>/JSON')
+def itemJSON(category_name, item_name):
+    category = session.query(Category).filter_by(name=category_name).one()
+    item = session.query(Item).filter_by(name=item_name).one()
+    return jsonify(item=item.serialize)
 
 
 @app.route('/login')
@@ -47,7 +74,7 @@ def gconnect():
 
     code = request.data
     try:
-        oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -97,6 +124,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    user_id = getUserID(login_session['email'])
+
+    if not user_id:
+        user_id = createUser(login_session)
+
+    login_session['user_id'] = user_id
     updateUser()
 
     flash("<big>You are now logged in as {}</big>".format(login_session['username']))
@@ -106,9 +139,25 @@ def gconnect():
 def updateUser():
     global user
     try:
-        user = session.query(User).filter_by(name=login_session['username']).one()
+        user = session.query(User).filter_by(email=login_session['email']).one()
     except:
-        user = User(name="Please Log In", picture=url_for('static', filename="img/profile.png"))
+        user = User(id=999, name="Please Log In", picture=url_for('static', filename="img/profile.png"))
+
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 
 @app.route('/gdisconnect')
@@ -125,8 +174,6 @@ def gdisconnect():
         response = make_response(json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    print('In gdisconnect access token is %s', access_token)
-    print('User name is: ')
     # print(login_session['username'])
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % credentials['access_token']
     h = httplib2.Http()
@@ -140,6 +187,7 @@ def gdisconnect():
         del login_session['email']
         del login_session['picture']
         del login_session['credentials']
+        del login_session['user_id']
         global user
         user = None
         response = make_response(json.dumps('Successfully disconnected.'), 200)
@@ -160,14 +208,15 @@ def displayCatalog():
 
     elif request.method == 'POST':
         global user
-        if user is not None:
+        if user is not None and user.id != 999:
             if login_session.get('credentials') is not None:
                 category_name = request.form['name']
                 if request.form['picuri']:
                     picuri = request.form['picuri']
                 else:
                     picuri = url_for('static', filename='img/athlete-beach-bodybuilder-305239.jpg')
-                session.add(Category(name=category_name, picture=picuri, user=user))
+                userLocal = session.query(User).filter_by(email=user.email).one()
+                session.add(Category(name=category_name, picture=picuri, user=userLocal))
                 session.commit()
                 return redirect(url_for('displayCatalog'))
             else:
@@ -184,7 +233,7 @@ def displayCatalog():
 def displayCategoryContents(catalog_name):
     if request.method == 'POST':
         global user
-        if user is not None:
+        if user is not None and user.id != 999:
             newItem = Item(
                 creationtime=datetime.now(),
                 category=session.query(Category).filter_by(name=catalog_name).one(),
@@ -222,7 +271,7 @@ def displayCategoryContents(catalog_name):
 @app.route('/catalog/<string:catalog_name>/<string:item_name>/', methods=['GET', 'POST'])
 def displayItemDetails(catalog_name, item_name):
     if request.method == 'POST':
-        if user is not None:
+        if user is not None and user.id != 999:
             editedItem: Item = session.query(Item).filter_by(name=item_name).one()
             if request.form['name']:
                 editedItem.name = request.form['name']
@@ -252,9 +301,27 @@ def displayItemDetails(catalog_name, item_name):
 @app.route('/<string:category_name>/<string:item_name>/delete', methods=['GET', 'POST'])
 def deleteItem(category_name, item_name):
     if request.method == 'POST':
-        if user is not None:
+        if user is not None and user.id != 999:
             category = session.query(Category).filter_by(name=category_name).one()
             session.delete(session.query(Item).filter_by(name=item_name, category=category).one())
+            session.commit()
+        else:
+            flash(
+                "<strong class='flash-message'>You are currently unauthorized to do this. Please <a href='{}'>sign in</a> to continue.</strong>".format(
+                    url_for('showLogin')))
+        return redirect(url_for('displayCategoryContents', catalog_name=category_name))
+    else:
+        return "Sorry! We don't accept 'GET' requests. :/"
+
+
+@app.route('/<string:category_name>/delete', methods=['POST', 'GET'])
+def deleteCategory(category_name):
+    if request.method == 'POST':
+        if user is not None and user.id != 999:
+            category = session.query(Category).filter_by(name=category_name).one()
+            for item in session.query(Item).filter_by(category=category).all():
+                session.delete(item)
+            session.delete(category)
             session.commit()
         else:
             flash(
