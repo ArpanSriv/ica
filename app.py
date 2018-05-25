@@ -22,7 +22,7 @@ app.secret_key = "SECRET_KEY"
 app.debug = True
 
 # SQLAlchemy Init
-engine = create_engine('sqlite:///catalog.db')
+engine = create_engine('sqlite:///catalog.db?check_same_thread=False')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
