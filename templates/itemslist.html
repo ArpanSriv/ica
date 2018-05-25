@@ -40,7 +40,18 @@
             </ul>
         </div>
 
-        <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+        {% if user %}
+            {% if user.id != 999 %}
+                <a class="btn btn-transparent" style="box-shadow: none"
+                   href="{{ url_for('showLogin') }}">{{ user.name }}</a>
+            {% endif %}
+
+        {% else %}
+
+            <a class="btn btn-transparent" style="box-shadow: none"
+               href="{{ url_for('showLogin') }}">Sign In</a>
+
+        {% endif %}
     </nav>
 {% endblock navbar %}
 

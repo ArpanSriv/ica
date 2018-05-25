@@ -106,11 +106,11 @@
                     if (result) {
                         $("#user-name").text(result["user"]["name"]);
                         $("#user-picture").attr('src', result["user"]["picture"]);
-
                         $("#profile-footer").append($disconnectButton);
 
+                        $.toast("Redirecting...");
+
                         setTimeout(function () {
-                            $.toast("Redirecting...");
                             window.location.href = '/catalog'
                         }, 3000);
 

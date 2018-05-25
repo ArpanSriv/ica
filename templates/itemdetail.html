@@ -5,7 +5,8 @@
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark brown">
 
         <!-- Navbar brand -->
-        <a class="navbar-brand" href="{{ url_for('displayCatalog') }}">Item Catalog</a>
+        <a class="navbar-brand" href="{{ url_for('displayCatalog') }}">Item
+            Catalog</a>
 
         <!-- Collapsible content -->
         <div class="collapse navbar-collapse" id="nav-links">
@@ -20,9 +21,11 @@
                 </li>
 
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown"
+                    <a class="nav-link dropdown-toggle"
+                       id="navbarDropdownMenuLink" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">Items</a>
-                    <div class="dropdown-menu dropdown-primary" aria-labelledby="navbarDropdownMenuLink">
+                    <div class="dropdown-menu dropdown-primary"
+                         aria-labelledby="navbarDropdownMenuLink">
                         {% if items %}
                             {% for item in items %}
                                 <a class="dropdown-item"
@@ -40,7 +43,18 @@
             </ul>
         </div>
 
-        <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+        {% if user %}
+            {% if user.id != 999 %}
+                <a class="btn btn-transparent" style="box-shadow: none"
+                   href="{{ url_for('showLogin') }}">{{ user.name }}</a>
+            {% endif %}
+
+        {% else %}
+
+            <a class="btn btn-transparent" style="box-shadow: none"
+               href="{{ url_for('showLogin') }}">Sign In</a>
+
+        {% endif %}
     </nav>
 {% endblock navbar %}
 
@@ -60,27 +74,41 @@
             <!-- Title -->
             <h4 class="card-title">{{ current_item.name }}</h4>
             <!-- Text -->
-            <p id="desctext" class="card-text">{{ current_item.description }}</p>
+            <p id="desctext"
+               class="card-text">{{ current_item.description }}</p>
             <!-- Buttons -->
             <span class="modifyButtons">
 
-           <a href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=current_item.name) }}"
-              class="btn btn-primary" id="editButton" data-toggle="modal" data-target="#modalEditForm">Edit</a>
-            <a href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=current_item.name) }}"
-               class="btn btn-primary" id="deleteButton" data-toggle="modal" data-target="#modalDeleteForm">Delete</a>
+            {% if user %}
+
+                {% if user.id != 999 %}
+                    <a href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=current_item.name) }}"
+                       class="btn btn-primary" id="editButton"
+                       data-toggle="modal"
+                       data-target="#modalEditForm">Edit</a>
+                    <a href="{{ url_for('displayItemDetails', catalog_name=catalog_name, item_name=current_item.name) }}"
+                       class="btn btn-primary" id="deleteButton"
+                       data-toggle="modal"
+                       data-target="#modalDeleteForm">Delete</a>
+                {% endif %}
+            {% endif %}
             </span>
 
         </div>
 
     </div>
 
-    <div class="modal fade" id="modalEditForm" tabindex="-1" role="dialog" aria-labelledby="editModal"
+    <div class="modal fade" id="modalEditForm" tabindex="-1" role="dialog"
+         aria-labelledby="editModal"
          aria-hidden="true" style="text-align: left">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-sm modal-dialog-centered"
+             role="document">
             <div class="modal-content">
                 <div class="modal-header text-center">
-                    <h4 class="modal-title w-100 font-weight-bold">Edit {{ current_item.name }}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h4 class="modal-title w-100 font-weight-bold">
+                        Edit {{ current_item.name }}</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -91,17 +119,23 @@
                           method="post">
 
                         <div class="md-form mb-5">
-                            <input type="text" id="nameInput" class="form-control" name="name">
-                            <label data-error="wrong" data-success="right" for="nameInput">Item Name</label>
+                            <input type="text" id="nameInput"
+                                   class="form-control" name="name">
+                            <label data-error="wrong" data-success="right"
+                                   for="nameInput">Item Name</label>
                         </div>
 
                         <div class="md-form mb-4">
-                            <textarea id="descInput" class="form-control md-textarea" name="description"></textarea>
-                            <label data-error="wrong" data-success="right" for="descInput">Details</label>
+                            <textarea id="descInput"
+                                      class="form-control md-textarea"
+                                      name="description"></textarea>
+                            <label data-error="wrong" data-success="right"
+                                   for="descInput">Details</label>
                         </div>
 
                         <div class="md-form mb-4">
-                            <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="category"
+                            <select class="custom-select mr-sm-2"
+                                    id="inlineFormCustomSelect" name="category"
                                     title="Category">
                                 {% for cat in categories %}
                                     <option value="{{ cat.id }}"
@@ -111,7 +145,8 @@
                         </div>
 
                         <div class="md-form mb-5">
-                            <button type="submit" class="btn btn-red">Submit</button>
+                            <button type="submit" class="btn btn-red">Submit
+                            </button>
                         </div>
 
                     </form>
@@ -121,13 +156,17 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalDeleteForm" tabindex="-1" role="dialog" aria-labelledby="deleteModal"
+    <div class="modal fade" id="modalDeleteForm" tabindex="-1" role="dialog"
+         aria-labelledby="deleteModal"
          aria-hidden="true" style="text-align: left">
-        <div class="modal-dialog modal-sm modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-sm modal-dialog-centered"
+             role="document">
             <div class="modal-content">
                 <div class="modal-header text-center">
-                    <h4 class="modal-title w-100 font-weight-bold">Delete {{ current_item.name }}</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <h4 class="modal-title w-100 font-weight-bold">
+                        Delete {{ current_item.name }}</h4>
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -141,8 +180,11 @@
                 <div class="modal-footer d-flex justify-content-center">
                     <form action="{{ url_for('deleteItem', item_name=current_item.name, category_name=category.name) }}"
                           method="post">
-                        <button type="submit" class="btn btn-red">Delete</button>
-                        <button data-dismiss="modal" class="btn btn-indigo">Cancel</button>
+                        <button type="submit" class="btn btn-red">Delete
+                        </button>
+                        <button data-dismiss="modal" class="btn btn-indigo">
+                            Cancel
+                        </button>
                     </form>
                 </div>
             </div>

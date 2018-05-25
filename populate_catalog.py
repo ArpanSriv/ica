@@ -174,7 +174,7 @@ categories = {
 
 user1 = User(
     id=1,
-    name="Amanda",
+    name="Dummy User",
     email="dummyisthis@gmail.com",
     picture="https://image.flaticon.com/icons/svg/236/236934.svg"
 )

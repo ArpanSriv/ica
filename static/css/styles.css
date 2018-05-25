@@ -47,16 +47,17 @@
     height: 64px;
     background-color: red;
     border-radius: 50%;
-    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.2),
+                0 6px 20px 0 rgba(0, 0, 0, 0.19);
     transition: all 0.1s ease-in-out;
     z-index: 2;
-    font-size: 50px;
+    font-size: 40px;
     color: white;
     text-align: center;
-    line-height: 70px;
+    line-height: 67px;
     position: fixed;
-    right: 50px;
-    bottom: 50px;
+    right: 64px;
+    bottom: 64px;
 }
 
 .fab:hover {
