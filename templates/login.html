@@ -10,38 +10,34 @@
 
 
     <!-- JQuery -->
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/jquery.toast.min.css') }}">
+    <link rel="stylesheet" type="text/css"
+          href="{{ url_for('static', filename='css/jquery.toast.min.css') }}">
     <script src="{{ url_for('static', filename='js/jquery.toast.min.js') }}"></script>
 
     <!--Material Design Bootstrap-->
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Bootstrap core CSS -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css"
+          rel="stylesheet">
     <!-- Material Design Bootstrap -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css" rel="stylesheet">
-
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript"
-            src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/css/mdb.min.css"
+          rel="stylesheet">
     <!--End of Material Design Bootstrap-->
 
     <!--Static CSS-->
-    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel=stylesheet type=text/css
+          href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
 
-<div class="card mx-auto" style="width: 50%; margin: 100px">
+<div class="card mx-auto" id="profile-card" style="width: 50%; margin: 100px">
 
     <!-- GOOGLE PLUS SIGN IN-->
     <div class="card-header" style="text-align: center">
@@ -52,14 +48,19 @@
 
         <div style="width: 100px; height: 100px;">
 
-            <img class="img-fluid" style="border-radius: 50%; min-width: 100%;" src="{{ user.picture }}" alt="">
+            <img class="img-fluid" id="user-picture"
+                 style="border-radius: 50%; min-width: 100%;"
+                 src="{{ user.picture }}" alt="">
 
         </div>
 
     </div>
 
-    <div class="card-footer d-flex justify-content-center">
-        <div id="signinButton" style="padding: inherit;">
+
+    <div id="profile-footer" class="card-footer d-flex justify-content-center">
+
+        {% if user.id == 999 %}
+            <div id="signinButton" style="padding: inherit;">
                   <span class="g-signin"
                         data-scope="openid email"
                         data-clientid="498756033550-hf4rh2lntl6b18anjrd64nl4kcogplad.apps.googleusercontent.com"
@@ -69,21 +70,29 @@
                         data-callback="signInCallback"
                         data-approvalprompt="force">
                   </span>
-        </div>
+            </div>
+        {% endif %}
 
-        <a href="/gdisconnect" class="btn btn-red">LOGOUT</a>
+        {% if user and user.id != 999 %}
+            <a href="/gdisconnect" id="logout-button"
+               class="btn btn-red">LOGOUT</a>
+        {% endif %}
+
 
     </div>
 
 </div>
 
-<script>
+<script type="text/javascript">
+
+    let $disconnectButton = '<a href="/gdisconnect" id="logout-button" class="btn btn-red">LOGOUT</a>';
 
     function signInCallback(authResult) {
         if (authResult['code']) {
 
             // Hide the sign-in button now that the user is authorized
             $('#signinButton').attr('style', 'display: none');
+            $("#user-name").text("Loading...");
 
             // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
             $.ajax({
@@ -95,12 +104,15 @@
                 success: function (result) {
                     // Handle or verify the server response if necessary.
                     if (result) {
-                        window.location.reload();
+                        $("#user-name").text(result["user"]["name"]);
+                        $("#user-picture").attr('src', result["user"]["picture"]);
+
+                        $("#profile-footer").append($disconnectButton);
 
                         setTimeout(function () {
                             $.toast("Redirecting...");
                             window.location.href = '/catalog'
-                        }, 1000);
+                        }, 3000);
 
                     } else if (authResult['error']) {
 
@@ -115,6 +127,17 @@
         }
     }
 </script>
+
+
+<!-- Bootstrap tooltips -->
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.5.0/js/mdb.min.js"></script>
 
 </body>
 
