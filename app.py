@@ -12,7 +12,7 @@ from flask import make_response, jsonify
 from flask import session as login_session
 from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 from sqlalchemy import create_engine, asc, desc
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy.orm import sessionmaker
 
 from database_setup import Base, Category, Item, User
 
