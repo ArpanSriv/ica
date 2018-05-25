@@ -24,7 +24,8 @@ app.debug = True
 # SQLAlchemy Init
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
-session = scoped_session(sessionmaker(bind=engine))
+DBSession = sessionmaker(bind=engine)
+session = DBSession()
 
 # Load up the client id from the client_secrets.json
 CLIENT_ID = json.loads(
@@ -41,7 +42,7 @@ user = None
 @app.route('/catalog', methods=['GET', 'POST'])
 def displayCatalog():
     if request.method == 'GET':
-        categories = session.query(Category).order_by(asc(Category.name))
+        categories = session.query(Category).order_by(asc(Category.name)).all()
         return render_template('catalog.html', categories=categories)
 
     elif request.method == 'POST':
@@ -54,7 +55,9 @@ def displayCatalog():
                     picuri = request.form['picuri']
                 else:
                     picuri = url_for('static',
-                                     filename='img/athlete-beach-bodybuilder-305239.jpg')
+                                     filename='img/'
+                                              'athlete-'
+                                              'beach-bodybuilder-305239.jpg')
 
                 userLocal = session \
                     .query(User) \
@@ -67,12 +70,20 @@ def displayCatalog():
                 return redirect(url_for('displayCatalog'))
             else:
                 flash(
-                    "<big>Bummer! There's authentication error. Please try refreshing/logging in again.</big>")
+                    "<big>"
+                    "Bummer! "
+                    "There's authentication error. "
+                    "Please try refreshing/logging in again.</big>")
                 return redirect(url_for('displayCatalog'))
         else:
             flash(
-                "<strong class='flash-message'>You are currently unauthorized to do this. Please <a href='{}'>sign in</a> to continue.</strong>".format(
-                    url_for('showLogin')))
+                "<strong class='flash-message'>"
+                "You are currently unauthorized to do this."
+                " Please <a href='{}'>sign in</a> to continue."
+                "</strong>".format(
+                    url_for('showLogin')
+                )
+            )
             return redirect(url_for('displayCatalog'))
 
 
@@ -104,15 +115,24 @@ def displayCategoryContents(catalog_name):
                 newItem.picture = request.form['picuri']
             else:
                 newItem.picture = url_for('static',
-                                          filename='img/athlete-beach-bodybuilder-305239.jpg')
+                                          filename='img/'
+                                                   'athlete-'
+                                                   'beach-'
+                                                   'bodybuilder-305239.jpg')
 
             session.add(newItem)
             session.commit()
             flash("Item {} created.".format(newItem.name))
         else:
             flash(
-                "<strong class='flash-message'>You are currently unauthorized to do this. Please <a href='{}'>sign in</a> to continue.</strong>"
+                "<strong class='flash-message'>"
+                "You are currently unauthorized to do this."
+                " Please <a href='{}'>sign in</a> to continue."
+                "</strong>"
                 .format(url_for('showLogin')))
+            flash(" If you already logged in,"
+                  " try logging out, logging in again.")
+
         return redirect(
             url_for('displayCategoryContents',
                     catalog_name=catalog_name)
@@ -120,7 +140,7 @@ def displayCategoryContents(catalog_name):
 
     else:
         category = session.query(Category).filter_by(name=catalog_name).one()
-        items = session.query(Item).filter_by(category=category)
+        items = session.query(Item).filter_by(category=category).all()
         return render_template(
             'itemslist.html',
             items=items,
@@ -135,9 +155,14 @@ def displayItemDetails(catalog_name, item_name):
     if request.method == 'POST':
         # Check if the current user is not the dummy user
         if user is not None and user.id != 999:
+            editedItemCategory = session \
+                .query(Category) \
+                .filter_by(name=catalog_name) \
+                .one()
+
             editedItem = session \
                 .query(Item) \
-                .filter_by(name=item_name) \
+                .filter_by(category=editedItemCategory, name=item_name) \
                 .one()
             if request.form['name']:
                 editedItem.name = request.form['name']
@@ -157,7 +182,12 @@ def displayItemDetails(catalog_name, item_name):
                 catalog_name=catalog_name))
         else:
             flash(
-                "<big>Authentication error occurred. Try refreshing the page/logging in again.</big>"
+                "<big>Authentication error occurred. "
+                "Try refreshing the page/logging in again.</big>"
+            )
+
+            flash(
+                " If you already logged in, try logging out, logging in again."
             )
             return redirect(url_for(
                 'displayCategoryContents',
@@ -165,7 +195,8 @@ def displayItemDetails(catalog_name, item_name):
             ))
 
     else:
-        # Categories needed for editing the item details and displaying in drop down menu
+        # Categories needed for editing the item details and
+        # displaying in drop down menu
         categories = session.query(Category).all()
         catalog = session. \
             query(Category). \
@@ -186,7 +217,7 @@ def displayItemDetails(catalog_name, item_name):
 
 # Displays the most recently added items
 @app.route('/recents/')
-def displayRecent():
+def displayRecents():
     categories = session.query(Category).order_by(asc(Category.name))
     recents = session.query(Item).order_by(desc(Item.creationtime))
     return render_template(
@@ -202,28 +233,50 @@ def displayRecent():
            methods=['GET', 'POST'])
 def deleteItem(category_name, item_name):
     if request.method == 'POST':
-        global user
+
+        category = session \
+            .query(Category) \
+            .filter_by(name=category_name) \
+            .one()
+
+        item = session \
+            .query(Item) \
+            .filter_by(name=item_name, category=category) \
+            .one()
+
         # Check if the current user is not the dummy user
-        if user is not None and user.id != 999:
-            category = session \
-                .query(Category) \
-                .filter_by(name=category_name) \
-                .one()
-            session.delete(session
-                           .query(Item)
-                           .filter_by(name=item_name, category=category)
-                           .one()
-                           )
+        if user is not None and user.id != item.user.id:
+            flash(
+                "<strong class='flash-message'>Error."
+                " Cannot delete items you didn't create.</strong>")
+            return redirect(url_for(
+                'displayItemDetails',
+                catalog_name=category_name,
+                item_name=item_name
+            ))
+
+        elif user is not None and user.id != 999:
+            session.delete(item)
             session.commit()
+            flash("Item '{}' deleted successfully".format(item_name))
+            return redirect(
+                url_for('displayCategoryContents', catalog_name=category_name))
+
         else:
             flash(
-                "<strong class='flash-message'>You are currently unauthorized to do this. Please <a href='{}'>sign in</a> to continue.</strong>"
+                "<strong class='flash-message'>"
+                "You are currently unauthorized to do this. "
+                "Please <a href='{}'>sign in</a> to continue.</strong>"
                 .format(url_for('showLogin')))
-        return redirect(url_for(
-            'displayItemDetails',
-            catalog_name=category_name,
-            item_name=item_name
-        ))
+
+            flash(
+                " If you already logged in, try logging out, logging in again."
+            )
+            return redirect(url_for(
+                'displayItemDetails',
+                catalog_name=category_name,
+                item_name=item_name
+            ))
     else:
         return "Sorry! We don't accept 'GET' requests. :/"
 
@@ -233,19 +286,34 @@ def deleteItem(category_name, item_name):
 def deleteCategory(category_name):
     if request.method == 'POST':
         # Check if the current user is not the dummy user
-        if user is not None and user.id != 999:
-            category = session \
-                .query(Category) \
-                .filter_by(name=category_name) \
-                .one()
+        category = session \
+            .query(Category) \
+            .filter_by(name=category_name) \
+            .one()
+
+        if user is not None and user.id != category.user.id:
+            flash(
+                "<strong>"
+                "You can't delete the category you didn't create."
+                "</strong>")
+            return redirect(url_for('displayCatalog'))
+
+        elif user is not None and user.id != 999:
             for item in session.query(Item).filter_by(category=category).all():
                 session.delete(item)
             session.delete(category)
             session.commit()
         else:
             flash(
-                "<strong class='flash-message'>You are currently unauthorized to do this. Please <a href='{}'>sign in</a> to continue.</strong>"
+                "<strong class='flash-message'>"
+                "You are currently unauthorized to do this. "
+                "Please <a href='{}'>sign in</a> to continue."
+                "</strong>"
                 .format(url_for('showLogin')))
+
+            flash(
+                " If you already logged in, try logging out, logging in again."
+            )
         return redirect(url_for('displayCatalog'))
     else:
         return "Sorry! We don't accept 'GET' requests. :/"
@@ -345,9 +413,12 @@ def gconnect():
     login_session['user_id'] = user_id
     updateUser()
 
-    flash("<big>You are now logged in as {}</big>"
-          .format(login_session['username']))
-    return redirect(url_for('displayCatalog'))
+    # flash("")
+
+    output = "<big>You are now logged in as {}</big>".format(
+        login_session['username'])
+    flash(output)
+    return jsonify(user=user.serialize)
 
 
 @app.route('/gdisconnect')
@@ -436,7 +507,8 @@ def updateUser():
     global user
     try:
         # Find user by email
-        user = session.query(User).filter_by(email=login_session['email']).one()
+        user = session.query(User).filter_by(email=login_session['email'])\
+            .one()
     except:
         # Create dummy user
         user = User(
@@ -474,6 +546,7 @@ def calculateTimeElapsed(creation_time):
 
 # Set this function as global to use in Jinja Template
 app.jinja_env.globals.update(calculate_elapsed_time=calculateTimeElapsed)
+
 
 if __name__ == '__main__':
     app.run(debug=False)

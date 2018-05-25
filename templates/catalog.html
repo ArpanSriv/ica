@@ -35,7 +35,12 @@
 
         </div>
 
-        <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+        {% if not session.logged_in %}
+            <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Profile</a>
+        {% else %}
+            <a class="btn btn-transparent" style="box-shadow: none" href="{{ url_for('showLogin') }}">Logged In</a>
+        {% endif %}
+
     </nav>
 
 {% endblock navbar %}
@@ -80,7 +85,7 @@
                         <div class="card-footer d-flex justify-content-center">
 
                             <form action="{{ url_for('deleteCategory', category_name=category.name) }}" method="post">
-                                <button href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}" class="btn btn-primary">Explore</button>
+                                <a href="{{ url_for('displayCategoryContents', catalog_name=category.name) }}" class="btn btn-primary">Explore</a>
                                 <button class="btn btn-red"><i class="fa fa-trash" aria-hidden="true"></i></button>
                             </form>
 
