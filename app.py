@@ -41,12 +41,18 @@ user = None
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/catalog', methods=['GET', 'POST'])
 def displayCatalog():
+    global user
     if request.method == 'GET':
+        if user is None or (user and user.id == 999):
+            flash("<strong>"
+                  "You may <a href='{}'>sign in</a> to edit, create or delete "
+                  "items and categories."
+                  "</strong>"
+                  .format(url_for('showLogin')))
         categories = session.query(Category).order_by(asc(Category.name)).all()
-        return render_template('catalog.html', categories=categories)
+        return render_template('catalog.html', categories=categories, user=user)
 
     elif request.method == 'POST':
-        global user
         # Check if the current user is not the dummy user
         if user is not None and user.id != 999:
             if login_session.get('credentials') is not None:
@@ -97,14 +103,16 @@ def displayCategoryContents(catalog_name):
             newItem = Item(
                 creationtime=datetime.now(),
                 category=session
-                .query(Category)
-                .filter_by(name=catalog_name)
-                .one(),
+                    .query(Category)
+                    .filter_by(name=catalog_name)
+                    .one(),
                 user=user)
             if request.form['name']:
                 newItem.name = request.form['name']
             else:
-                return
+                flash("Cannot create an item without a name. Please try again.")
+                return redirect(url_for('displayCategoryContents',
+                                        catalog_name=catalog_name))
 
             if request.form['description']:
                 newItem.description = request.form['description']
@@ -129,7 +137,7 @@ def displayCategoryContents(catalog_name):
                 "You are currently unauthorized to do this."
                 " Please <a href='{}'>sign in</a> to continue."
                 "</strong>"
-                .format(url_for('showLogin')))
+                    .format(url_for('showLogin')))
             flash(" If you already logged in,"
                   " try logging out, logging in again.")
 
@@ -144,7 +152,8 @@ def displayCategoryContents(catalog_name):
         return render_template(
             'itemslist.html',
             items=items,
-            catalog_name=catalog_name
+            catalog_name=catalog_name,
+            user=user
         )
 
 
@@ -153,7 +162,23 @@ def displayCategoryContents(catalog_name):
            methods=['GET', 'POST'])
 def displayItemDetails(catalog_name, item_name):
     if request.method == 'POST':
+
+        category = session \
+            .query(Category) \
+            .filter_by(name=catalog_name) \
+            .one()
+
+        itemToEdit = session.query(Item) \
+            .filter_by(category=category, name=item_name) \
+            .one()
+
         # Check if the current user is not the dummy user
+        if user is not None and user.id != itemToEdit.user.id:
+            flash("Error. You can't edit the items you didn't create.")
+            return redirect(url_for('displayItemDetails',
+                                    catalog_name=catalog_name,
+                                    item_name=item_name
+                                    ))
         if user is not None and user.id != 999:
             editedItemCategory = session \
                 .query(Category) \
@@ -179,7 +204,9 @@ def displayItemDetails(catalog_name, item_name):
             flash('{} Successfully Edited'.format(editedItem.name))
             return redirect(url_for(
                 'displayCategoryContents',
-                catalog_name=catalog_name))
+                catalog_name=catalog_name,
+                user=user
+            ))
         else:
             flash(
                 "<big>Authentication error occurred. "
@@ -211,7 +238,8 @@ def displayItemDetails(catalog_name, item_name):
             categories=categories,
             category=catalog,
             current_item=item,
-            items=itemslist
+            items=itemslist,
+            user=user
         )
 
 
@@ -224,7 +252,8 @@ def displayRecents():
         'recent.html',
         categories=categories,
         recents=recents,
-        current_time=datetime.now()
+        current_time=datetime.now(),
+        user=user
     )
 
 
@@ -252,7 +281,8 @@ def deleteItem(category_name, item_name):
             return redirect(url_for(
                 'displayItemDetails',
                 catalog_name=category_name,
-                item_name=item_name
+                item_name=item_name,
+                user=user
             ))
 
         elif user is not None and user.id != 999:
@@ -267,7 +297,7 @@ def deleteItem(category_name, item_name):
                 "<strong class='flash-message'>"
                 "You are currently unauthorized to do this. "
                 "Please <a href='{}'>sign in</a> to continue.</strong>"
-                .format(url_for('showLogin')))
+                    .format(url_for('showLogin')))
 
             flash(
                 " If you already logged in, try logging out, logging in again."
@@ -309,7 +339,7 @@ def deleteCategory(category_name):
                 "You are currently unauthorized to do this. "
                 "Please <a href='{}'>sign in</a> to continue."
                 "</strong>"
-                .format(url_for('showLogin')))
+                    .format(url_for('showLogin')))
 
             flash(
                 " If you already logged in, try logging out, logging in again."
@@ -450,12 +480,12 @@ def gdisconnect():
         del login_session['user_id']
         global user
         user = None
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+        flash("Successfully Logged Out.")
+        return redirect(url_for('displayCatalog'))
     else:
         response = make_response(json.dumps(
-            'Failed to revoke token for given user.')
+            'Failed to revoke token for given user. Please open in a '
+            'new window and log in again.')
         )
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -474,9 +504,9 @@ def catalogJSON():
             .one()
         items = [
             i.serialize for i in session
-            .query(Item)
-            .filter_by(category=category)
-            .all()
+                .query(Item)
+                .filter_by(category=category)
+                .all()
         ]
         if items:
             category_dict[c]["items"] = items
@@ -507,7 +537,7 @@ def updateUser():
     global user
     try:
         # Find user by email
-        user = session.query(User).filter_by(email=login_session['email'])\
+        user = session.query(User).filter_by(email=login_session['email']) \
             .one()
     except:
         # Create dummy user
@@ -546,7 +576,6 @@ def calculateTimeElapsed(creation_time):
 
 # Set this function as global to use in Jinja Template
 app.jinja_env.globals.update(calculate_elapsed_time=calculateTimeElapsed)
-
 
 if __name__ == '__main__':
     app.run(debug=False)

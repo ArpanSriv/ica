@@ -76,9 +76,13 @@
 
     </div>
 
-    {% block fab %}
+    {% if user %}
+        {% if user.id != 999 %}
+            {% block fab %}
 
-    {% endblock fab %}
+            {% endblock fab %}
+        {% endif %}
+    {% endif %}
 
 </div>
 
