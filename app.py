@@ -50,7 +50,9 @@ def displayCatalog():
                   "</strong>"
                   .format(url_for('showLogin')))
         categories = session.query(Category).order_by(asc(Category.name)).all()
-        return render_template('catalog.html', categories=categories, user=user)
+        return render_template('catalog.html',
+                               categories=categories,
+                               user=user)
 
     elif request.method == 'POST':
         # Check if the current user is not the dummy user
@@ -103,14 +105,15 @@ def displayCategoryContents(catalog_name):
             newItem = Item(
                 creationtime=datetime.now(),
                 category=session
-                    .query(Category)
-                    .filter_by(name=catalog_name)
-                    .one(),
+                .query(Category)
+                .filter_by(name=catalog_name)
+                .one(),
                 user=user)
             if request.form['name']:
                 newItem.name = request.form['name']
             else:
-                flash("Cannot create an item without a name. Please try again.")
+                flash("Cannot create an item without a name."
+                      " Please try again.")
                 return redirect(url_for('displayCategoryContents',
                                         catalog_name=catalog_name))
 
@@ -137,7 +140,7 @@ def displayCategoryContents(catalog_name):
                 "You are currently unauthorized to do this."
                 " Please <a href='{}'>sign in</a> to continue."
                 "</strong>"
-                    .format(url_for('showLogin')))
+                .format(url_for('showLogin')))
             flash(" If you already logged in,"
                   " try logging out, logging in again.")
 
@@ -297,7 +300,7 @@ def deleteItem(category_name, item_name):
                 "<strong class='flash-message'>"
                 "You are currently unauthorized to do this. "
                 "Please <a href='{}'>sign in</a> to continue.</strong>"
-                    .format(url_for('showLogin')))
+                .format(url_for('showLogin')))
 
             flash(
                 " If you already logged in, try logging out, logging in again."
@@ -339,7 +342,7 @@ def deleteCategory(category_name):
                 "You are currently unauthorized to do this. "
                 "Please <a href='{}'>sign in</a> to continue."
                 "</strong>"
-                    .format(url_for('showLogin')))
+                .format(url_for('showLogin')))
 
             flash(
                 " If you already logged in, try logging out, logging in again."
@@ -462,7 +465,8 @@ def gdisconnect():
     access_token = credentials['access_token']
     if access_token is None:
         print('Access Token is None')
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(json.dumps('Current user not connected.'),
+                                 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % credentials[
@@ -503,7 +507,7 @@ def catalogJSON():
             .filter_by(name=category_dict[c]["name"]) \
             .one()
         items = [
-            i.serialize for i in session
+                i.serialize for i in session
                 .query(Item)
                 .filter_by(category=category)
                 .all()
