@@ -36,11 +36,12 @@ This app is a project for the Full Stack Web Developer Nanodegree at Udacity.
     4. Install `requests` module by issuing the command `sudo pip install requests`
     5. Set up the database by running the [database_setup.py](database_setup.py) file.
     6. Insert dummy data into the database by running [populate_catalog.py](populate_catalog.py) file.
-    7. Run the [app.py](app.py) file.
+    7. Run the [app.py](app.py) file (using **Python 3.6 or higher only**).
 
 * ### Usage
 
     You can access the webpage at [http://localhost:5000](http://localhost:5000 "Localhost at port 5000").
+   - **Run using Python 3.6 or higher only.**
    - _Note: Don't run the server using `http://127.0.0.1:5000` as it can cause problems with the Google Sign In._
 
 * ### API Endpoints
